@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; }
+    a { color: #58a6ff; text-decoration: none; }
+    header { display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; background: linear-gradient(135deg, #0d1117, #161b22); text-align: center; }
+    header h1 { font-size: 3rem; margin-bottom: 1rem; }
+    header p { font-size: 1.2rem; margin-bottom: 2rem; }
+    nav { position: fixed; top: 0; width: 100%; background: rgba(13,17,23,0.9); padding: 1rem; display: flex; justify-content: center; gap: 1rem; }
+    nav a:hover { color: #ffffff; }
+    section { max-width: 900px; margin: auto; padding: 4rem 1rem; }
+    h2 { font-size: 2rem; margin-bottom: 1rem; color: #58a6ff; }
+    .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .card { background: #161b22; padding: 1rem; border-radius: 10px; transition: transform 0.3s ease; }
+    .card:hover { transform: translateY(-5px); }
+    footer { text-align: center; padding: 2rem; background: #0d1117; }
+    .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <header>
+    <h1>Your Name</h1>
+    <p>Future Web Developer & Creator</p>
+    <a href="#projects" style="padding: 0.8rem 1.5rem; background: #58a6ff; color: #fff; border-radius: 5px;">View My Work</a>
+  </header>
+
+  <section id="about" class="fade-in">
+    <h2>About Me</h2>
+    <p>Hello! I'm a passionate student learning web development. I enjoy creating modern, responsive websites and exploring new technologies.</p>
+  </section>
+
+  <section id="projects" class="fade-in">
+    <h2>Projects</h2>
+    <div class="projects">
+      <div class="card">
+        <h3>Project One</h3>
+        <p>A cool project I built using HTML, CSS, and JavaScript.</p>
+        <a href="#">View Project</a>
+      </div>
+      <div class="card">
+        <h3>Project Two</h3>
+        <p>Another project showcasing my skills in frontend development.</p>
+        <a href="#">View Project</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="fade-in">
+    <h2>Skills</h2>
+    <p>HTML, CSS, JavaScript, Git, Responsive Design</p>
+  </section>
+
+  <section id="contact" class="fade-in">
+    <h2>Contact Me</h2>
+    <p>Email: <a href="mailto:your@email.com">your@email.com</a></p>
+    <p>GitHub: <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></p>
+  </section>
+
+  <footer>
+    <p>© 2025 Your Name. Built with ❤️</p>
+  </footer>
+
+  <script>
+    // Fade-in animation on scroll
+    const elements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    elements.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
