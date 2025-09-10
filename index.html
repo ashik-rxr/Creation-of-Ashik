@@ -19,6 +19,8 @@
     .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
     .card { background: #161b22; padding: 1rem; border-radius: 10px; transition: transform 0.3s ease; }
     .card:hover { transform: translateY(-5px); }
+    .work-images { display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
+    .work-images img { width: 270px; max-width: 90vw; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid #23272e; }
     footer { text-align: center; padding: 2rem; background: #0d1117; }
     .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
     .fade-in.visible { opacity: 1; transform: translateY(0); }
@@ -33,14 +35,24 @@
   </nav>
 
   <header>
-    <h1>Your Name</h1>
-    <p>Future Web Developer & Creator</p>
+    <h1>Rahman Ashikur</h1>
+    <p>Future Web Developer &amp; Creator</p>
     <a href="#projects" style="padding: 0.8rem 1.5rem; background: #58a6ff; color: #fff; border-radius: 5px;">View My Work</a>
   </header>
 
   <section id="about" class="fade-in">
     <h2>About Me</h2>
-    <p>Hello! I'm a passionate student learning web development. I enjoy creating modern, responsive websites and exploring new technologies.</p>
+    <p>Hello! I'm Rahman Ashikur, a passionate student learning web development. I enjoy creating modern, responsive websites and exploring new technologies.</p>
+  </section>
+
+  <section id="work-images" class="fade-in">
+    <h2>My Work in Pictures</h2>
+    <div class="work-images">
+      <img src="images/your-professional-image1.jpg" alt="Website development process" />
+      <img src="images/your-professional-image2.jpg" alt="Designing a website" />
+      <img src="images/your-professional-image3.jpg" alt="Coding and web creation" />
+    </div>
+    <p style="text-align:center; margin-top:1rem; font-size:0.95rem;">* These are your professional images. Replace these sample filenames with your own work images in the <code>images/</code> folder.</p>
   </section>
 
   <section id="projects" class="fade-in">
@@ -67,11 +79,11 @@
   <section id="contact" class="fade-in">
     <h2>Contact Me</h2>
     <p>Email: <a href="mailto:your@email.com">your@email.com</a></p>
-    <p>GitHub: <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></p>
+    <p>GitHub: <a href="https://github.com/ashik-rxr" target="_blank">github.com/ashik-rxr</a></p>
   </section>
 
   <footer>
-    <p>© 2025 Your Name. Built with ❤️</p>
+    <p>© 2025 Rahman Ashikur. Built with ❤️</p>
   </footer>
 
   <script>
@@ -87,4 +99,5 @@
     elements.forEach(el => observer.observe(el));
   </script>
 </body>
+
 </html>
