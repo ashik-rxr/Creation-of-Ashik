@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dodge the Falling Blocks</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    canvas {
+      background: #222;
+      border: 2px solid #fff;
+      display: block;
+    }
+    #info {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">Move with ← → arrows. Avoid the red blocks!</div>
+  <canvas id="gameCanvas" width="500" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Player setup
+    const playerSize = 30;
+    let playerX = (canvas.width - playerSize) / 2;
+    const playerY = canvas.height - playerSize - 10;
+    const playerSpeed = 7;
+
+    // Blocks setup
+    const blocks = [];
+    let blockSpeed = 2;
+    let spawnRate = 90; // frames between new blocks
+    let frame = 0;
+
+    // Controls
+    let leftPressed = false, rightPressed = false;
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft") leftPressed = true;
+      if (e.key === "ArrowRight") rightPressed = true;
+      if (gameOver && e.code === "Space") restartGame();
+    });
+    document.addEventListener("keyup", e => {
+      if (e.key === "ArrowLeft") leftPressed = false;
+      if (e.key === "ArrowRight") rightPressed = false;
+    });
+
+    // Game state
+    let score = 0;
+    let gameOver = false;
+
+    function restartGame() {
+      score = 0;
+      blockSpeed = 2;
+      spawnRate = 90;
+      blocks.length = 0;
+      playerX = (canvas.width - playerSize) / 2;
+      gameOver = false;
+    }
+
+    function drawPlayer() {
+      ctx.fillStyle = "cyan";
+      ctx.fillRect(playerX, playerY, playerSize, playerSize);
+    }
+
+    function drawBlocks() {
+      ctx.fillStyle = "red";
+      blocks.forEach(b => ctx.fillRect(b.x, b.y, b.size, b.size));
+    }
+
+    function drawText() {
+      ctx.fillStyle = "white";
+      ctx.font = "20px Arial";
+      ctx.fillText("Score: " + score, 10, 25);
+    }
+
+    function updateBlocks() {
+      frame++;
+      if (frame % spawnRate === 0) {
+        blocks.push({ x: Math.random() * (canvas.width - 20), y: -20, size: 20 });
+      }
+      blocks.forEach(b => b.y += blockSpeed);
+
+      // Collision check
+      blocks.forEach(b => {
+        if (
+          playerX < b.x + b.size &&
+          playerX + playerSize > b.x &&
+          playerY < b.y + b.size &&
+          playerY + playerSize > b.y
+        ) {
+          gameOver = true;
+        }
+      });
+
+      // Remove blocks that leave screen
+      for (let i = blocks.length - 1; i >= 0; i--) {
+        if (blocks[i].y > canvas.height) {
+          blocks.splice(i, 1);
+          score++;
+          // increase difficulty
+          if (score % 5 === 0 && spawnRate > 30) spawnRate -= 5;
+          if (score % 10 === 0) blockSpeed += 0.5;
+        }
+      }
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!gameOver) {
+        // Move player
+        if (leftPressed && playerX > 0) playerX -= playerSpeed;
+        if (rightPressed && playerX < canvas.width - playerSize) playerX += playerSpeed;
+
+        updateBlocks();
+        drawPlayer();
+        drawBlocks();
+        drawText();
+      } else {
+        ctx.fillStyle = "white";
+        ctx.font = "30px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over!", canvas.width/2, canvas.height/2 - 20);
+        ctx.font = "20px Arial";
+        ctx.fillText("Final Score: " + score, canvas.width/2, canvas.height/2 + 10);
+        ctx.fillText("Press SPACE to restart", canvas.width/2, canvas.height/2 + 40);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>
