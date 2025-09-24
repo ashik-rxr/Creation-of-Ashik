@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dodge the Falling Blocks</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: white;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    canvas {
+      background: linear-gradient(#222, #111);
+      border: 2px solid #fff;
+      display: block;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    }
+    #info {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    #credit {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #credit a {
+      color: cyan;
+      text-decoration: none;
+    }
+    #credit a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">Use ← → arrows to move. Avoid the blocks!</div>
+  <canvas id="gameCanvas" width="500" height="400"></canvas>
+  <div id="credit">
+    Made by <a href="https://chatgpt.com/share/68cb93fa-cd90-8011-8fc9-2de41ef6fcf9" target="_blank">Me</a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // === Load Sounds ===
+    const sounds = {
+      score: new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"),
+      crash: new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"),
+      bgm: new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+    };
+    sounds.bgm.loop = true;
+    sounds.bgm.volume = 0.2;
+
+    // === Player Class ===
+    class Player {
+      constructor() {
+        this.size = 30;
+        this.x = (canvas.width - this.size) / 2;
+        this.y = canvas.height - this.size - 10;
+        this.speed = 6;
+      }
+      move(left, right) {
+        if (left && this.x > 0) this.x -= this.speed;
+        if (right && this.x < canvas.width - this.size) this.x += this.speed;
+      }
+      draw() {
+        ctx.fillStyle = "cyan";
+        ctx.shadowColor = "aqua";
+        ctx.shadowBlur = 10;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // === Block Class ===
+    class Block {
+      constructor(speed) {
+        this.size = 20;
+        this.x = Math.random() * (canvas.width - this.size);
+        this.y = -this.size;
+        this.speed = speed;
+      }
+      update() {
+        this.y += this.speed;
+      }
+      draw() {
+        ctx.fillStyle = "red";
+        ctx.shadowColor = "darkred";
+        ctx.shadowBlur = 15;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // === Game Class ===
+    class Game {
+      constructor() {
+        this.player = new Player();
+        this.blocks = [];
+        this.score = 0;
+        this.highScore = localStorage.getItem("highScore") || 0;
+        this.frame = 0;
+        this.blockSpeed = 2;
+        this.spawnRate = 90;
+        this.leftPressed = false;
+        this.rightPressed = false;
+        this.state = "start"; // start | playing | gameover
+        this.initControls();
+      }
+
+      initControls() {
+        document.addEventListener("keydown", e => {
+          if (e.key === "ArrowLeft") this.leftPressed = true;
+          if (e.key === "ArrowRight") this.rightPressed = true;
+
+          if (this.state === "start" && e.code === "Space") this.startGame();
+          if (this.state === "gameover" && e.code === "Space") this.restart();
+        });
+
+        document.addEventListener("keyup", e => {
+          if (e.key === "ArrowLeft") this.leftPressed = false;
+          if (e.key === "ArrowRight") this.rightPressed = false;
+        });
+      }
+
+      startGame() {
+        this.state = "playing";
+        this.score = 0;
+        this.blocks = [];
+        this.frame = 0;
+        this.blockSpeed = 2;
+        this.spawnRate = 90;
+        sounds.bgm.play().catch(() => {}); // autoplay fix
+      }
+
+      restart() {
+        this.startGame();
+      }
+
+      update() {
+        if (this.state !== "playing") return;
+
+        this.frame++;
+        this.player.move(this.leftPressed, this.rightPressed);
+
+        if (this.frame % this.spawnRate === 0) {
+          this.blocks.push(new Block(this.blockSpeed));
+        }
+
+        this.blocks.forEach(b => b.update());
+
+        // Remove off-screen + increase score
+        for (let i = this.blocks.length - 1; i >= 0; i--) {
+          if (this.blocks[i].y > canvas.height) {
+            this.blocks.splice(i, 1);
+            this.score++;
+            sounds.score.play();
+            if (this.score % 5 === 0 && this.spawnRate > 30) this.spawnRate -= 5;
+            if (this.score % 10 === 0) this.blockSpeed += 0.5;
+          }
+        }
+
+        // Collision
+        this.blocks.forEach(b => {
+          if (
+            this.player.x < b.x + b.size &&
+            this.player.x + this.player.size > b.x &&
+            this.player.y < b.y + b.size &&
+            this.player.y + this.player.size > b.y
+          ) {
+            this.state = "gameover";
+            sounds.crash.play();
+            sounds.bgm.pause();
+            if (this.score > this.highScore) {
+              this.highScore = this.score;
+              localStorage.setItem("highScore", this.highScore);
+            }
+          }
+        });
+      }
+
+      drawText(text, size, y) {
+        ctx.fillStyle = "white";
+        ctx.font = `${size}px Arial`;
+        ctx.textAlign = "center";
+        ctx.fillText(text, canvas.width / 2, y);
+      }
+
+      draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (this.state === "start") {
+          this.drawText("Dodge the Falling Blocks", 28, canvas.height / 2 - 40);
+          this.drawText("Press SPACE to Start", 20, canvas.height / 2);
+          return;
+        }
+
+        this.player.draw();
+        this.blocks.forEach(b => b.draw());
+
+        ctx.fillStyle = "white";
+        ctx.font = "18px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("Score: " + this.score, 10, 25);
+        ctx.fillText("High Score: " + this.highScore, 10, 50);
+
+        if (this.state === "gameover") {
+          this.drawText("Game Over!", 30, canvas.height / 2 - 20);
+          this.drawText("Final Score: " + this.score, 20, canvas.height / 2 + 10);
+          this.drawText("Press SPACE to Restart", 18, canvas.height / 2 + 40);
+        }
+      }
+    }
+
+    // === Run Game ===
+    const game = new Game();
+    function loop() {
+      game.update();
+      game.draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
