@@ -26,7 +26,6 @@
     .fade-in.visible { opacity: 1; transform: translateY(0); }
     .game-links { display: flex; flex-direction: column; gap: 2rem; }
 
-    /* Responsive iframe container */
     .game-container {
       position: relative;
       width: 100%;
@@ -159,7 +158,6 @@
   </footer>
 
   <script>
-    // Fade-in animation on scroll
     const elements = document.querySelectorAll('.fade-in');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
